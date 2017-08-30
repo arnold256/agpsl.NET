@@ -10,3 +10,5 @@ The library supports basic NMEA processing and the ability to send a (very) limi
 I am using the SerialPortStream library (https://github.com/jcurl/SerialPortStream) for accessing the comm port.  When running with mono under linux the DataReceived event does not fire.  Using this library allows agpsl.NET to function on linux.   
 
 Please note that only minimal testing has been done as I only require a small set of the functionality.
+
+So far the only GPS module this has been tested with is the SIM39EA.
