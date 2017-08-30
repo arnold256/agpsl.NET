@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "agpsl.NET", "D:\Datalogger\TS7680\Main\agpsl.NET\agpsl.NET\agpsl.NET.csproj", "{DB99DCA6-8A21-4730-AA57-9FEFF1A5C27E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GPSConsole", "src\GPSConsole\GPSConsole.csproj", "{3385E682-3B15-4EE7-B520-A45A82A0AE75}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB99DCA6-8A21-4730-AA57-9FEFF1A5C27E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB99DCA6-8A21-4730-AA57-9FEFF1A5C27E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB99DCA6-8A21-4730-AA57-9FEFF1A5C27E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB99DCA6-8A21-4730-AA57-9FEFF1A5C27E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3385E682-3B15-4EE7-B520-A45A82A0AE75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3385E682-3B15-4EE7-B520-A45A82A0AE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3385E682-3B15-4EE7-B520-A45A82A0AE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3385E682-3B15-4EE7-B520-A45A82A0AE75}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C09208EF-DEF7-4DDA-BF3D-33419F59ABA9}
+	EndGlobalSection
+EndGlobal
