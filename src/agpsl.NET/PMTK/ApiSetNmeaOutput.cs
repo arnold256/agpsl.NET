@@ -27,7 +27,7 @@ namespace agpsl.NET.PMTK
     /// There are totally 19 data fields that present output frequencies for the 19 supported NMEA sentences
     /// individually
     /// </summary>
-    public class ApiSetNmeaOutput : PmtkHelper
+    public class ApiSetNmeaOutput : InputMessage
     {
         /// <summary>
         /// Supported Frequency Setting
@@ -55,7 +55,7 @@ namespace agpsl.NET.PMTK
             Payload = $"{GLL},{RMC},{VTG},{GGA},{GSA},{GSV},{GRS},{GST},0,0,0,0,0,0,0,0,0,{ZDA},{MCHN},{DMT}";
         }
 
-        public override string Command => "314";
+        public override int Command => 314;
 
         public override string CommandName => "PMTK_API_SET_NMEA_OUTPUT ";
 

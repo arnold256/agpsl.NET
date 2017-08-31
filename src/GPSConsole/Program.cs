@@ -23,40 +23,82 @@
 using System;
 using agpsl.NET.PMTK;
 
-namespace GPS
+namespace GPSConsole
 {
     class Program
     {
-        public static PmtkHelper lastcommand;
-
         static void Main(string[] args)
         {
-            Console.WriteLine("Please Enter comport (COM6):");
+            var defaultstr = Environment.OSVersion.Platform == PlatformID.Unix ? "/dev/ttyAPP1" : "COM6";
+
+            Console.WriteLine($"Please Enter comport ({defaultstr}):");
 
             var commport = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(commport))
-                commport = "COM6";
+                commport = defaultstr;
 
-            Console.WriteLine("Please Enter Baudrate (115200):");
+            defaultstr = "115200";
+            Console.WriteLine($"Please Enter Baudrate ({defaultstr}):");
             var baud = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(baud))
-                baud = "115200";
+                baud = defaultstr;
 
             var gps = new agpsl.NET.GPS(commport, int.Parse(baud)) {LogToConsole = false};
-            gps.GPSEvent += (sender, message) => { Console.WriteLine(message); };
+            
+            var response = gps.SendTestMessage();
+            Console.WriteLine($"Response to test message was {response}");
+
 
             // Set the type of output you are interested in.
-            gps.SendCommandAsync(new ApiSetNmeaOutput(5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0));
+            response = gps.SendCommandAsync(new ApiSetNmeaOutput(5, 0, 0, 0, 0, 5, 0, 0, 1, 0, 0)).Result;
+            Console.WriteLine($"Response to ApiSetNmeaOutput was {response}");
+
+            InputMessage request = new ApiQDatum();
+            response = gps.SendCommandAsync(request).Result;
+
+            if(request.ResponseType == Message.PmtkResponseType.ValidCommandSuccess)
+                Console.WriteLine($"The default Datum was {((ApiQDatum)request).Datum}");
+            else            
+                Console.WriteLine($"Response to ApiQDatum was {response}");
+
+            request = new ApiQDatumAdvance();
+            response = gps.SendCommandAsync(request).Result;
+
+            if (request.ResponseType == Message.PmtkResponseType.ValidCommandSuccess)
+                Console.WriteLine($"The user defined Datum was {((ApiQDatum)request).Datum}");
+            else
+                Console.WriteLine($"Response to ApiQDatumAdvance was {response}");
+
+
+            request = new ApiQNemaOutput();
+            response = gps.SendCommandAsync(request).Result;
+
+            if (request.ResponseType == Message.PmtkResponseType.ValidCommandSuccess)
+                Console.WriteLine($"The NemaOutput was {((ApiQNemaOutput)request).ResponseString()}");
+            else
+                Console.WriteLine($"Response to ApiQNemaOutput was {response}");
+
+            // Set the type of output you are interested in.
+            response = gps.SendCommandAsync(new SetDatum(35)).Result;            
+            Console.WriteLine($"Response to SetDatum was {response}");
+
+
+            Console.WriteLine("Press any key to start NMEA output");
+            Console.ReadLine();
+            gps.GPSEvent += (sender, message) => { Console.WriteLine(message); };
 
             Console.WriteLine("Press any key to enter standby mode");
             Console.ReadLine();
-            gps.SendCommandAsync(new CmdStandbyMode(false));
-            
+            response = gps.SendCommandAsync(new CmdStandbyMode(false)).Result;
+            Console.WriteLine($"Response to CmdStandbyMode was {response}");
+
 
             Console.WriteLine("Press any key to enter Run mode");
             Console.ReadLine();
-            gps.SendCommandAsync(new CmdHotStart());
+            response = gps.SendCommandAsync(new CmdHotStart()).Result;
+            Console.WriteLine($"Response to CmdHotStart was {response}");
+
             Console.ReadLine();
         }        
     }

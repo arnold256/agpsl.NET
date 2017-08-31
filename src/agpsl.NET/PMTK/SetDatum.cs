@@ -22,23 +22,20 @@
 
 namespace agpsl.NET.PMTK
 {
-    public class PmtkSetNemaBaudrate : PmtkHelper
+    public class SetDatum : InputMessage
     {
+
         /// <summary>
-        /// Set NMEA port baudrate.Using PMTK251 command to setup baud rate setting, the setting will be back to
-        /// defatult value in the two conditions:
-        /// 1. Full cold start command is issued
-        /// 2. Enter standby mode
         /// </summary>
-        /// <param name="baudrate"></param>
-        public PmtkSetNemaBaudrate(string baudrate)
+        /// <param name="DatumId"> 35 = Australian Geodetic 1984 </param>
+        public SetDatum(int datumId)
         {
-            Payload = baudrate;
+            Payload = datumId.ToString();
         }
 
-        public override string Command => "251";
+        public override int Command => 330;
 
-        public override string CommandName => "PMTK_SET_NMEA_BAUDRATE ";
+        public override string CommandName => "PMTK_API_SET_DATUM";
 
         public override string Payload { get;}
     }

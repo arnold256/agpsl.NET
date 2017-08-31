@@ -27,14 +27,14 @@ namespace agpsl.NET.NMEA
     /// <summary>
     /// Recommended minimum specific GPS/Transit data
     /// </summary>
-    public class GPGLL : MNEAHelper
+    public class GPGLL : Message
     {       
         public GPGLL(string message)
         {
             var parts = message.Split(',');
 
             //Calculate the time of the fix
-            TimeOfSolution = ParseDateTime(parts[5]);
+            TimeOfPosition = ParseDateTime(parts[5]);
 
             //Calculate Longitude
             Longitude = GPSToDecimalDegrees(parts[3], parts[4]);
@@ -56,9 +56,9 @@ namespace agpsl.NET.NMEA
         public double Longitude { get; }
 
         /// <summary>
-        /// UTC Of Position Solution
+        /// Time of Position
         /// </summary>
-        public DateTime TimeOfSolution { get; }
+        public DateTime TimeOfPosition { get; }
 
         /// <summary>
         /// Data valid (true for valid or false for data invalid).
@@ -67,7 +67,7 @@ namespace agpsl.NET.NMEA
 
         public override string ToString()
         {
-            return $"$GPGLL TimeOfSolution: {TimeOfSolution} - Latitude: {Latitude} - Longitude: {Longitude} - DataValid: {DataValid}";
+            return $"$GPGLL TimeOfPosition: {TimeOfPosition} - Latitude: {Latitude} - Longitude: {Longitude} - DataValid: {DataValid}";
         }
 
     }

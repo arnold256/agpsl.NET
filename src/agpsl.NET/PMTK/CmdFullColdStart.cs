@@ -22,9 +22,9 @@
 
 namespace agpsl.NET.PMTK
 {
-    public class CmdFullColdStart : PmtkHelper
+    public class CmdFullColdStart : InputMessage
     {
-        public override string Command => "104";
+        public override int Command => 104;
 
         public override string CommandName => "PMTK_CMD_FULL_COLD_START";
 

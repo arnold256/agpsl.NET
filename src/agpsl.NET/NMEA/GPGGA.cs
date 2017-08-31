@@ -27,7 +27,7 @@ namespace agpsl.NET.NMEA
     /// <summary>
     /// Recommended minimum specific GPS/Transit data
     /// </summary>
-    public class GPRMC : MNEAHelper
+    public class GPRMC : Message
     {
         /// <summary>
         /// Enum for the Receiver Status information.
@@ -49,7 +49,7 @@ namespace agpsl.NET.NMEA
             var parts = message.Split(',');
 
             //Calculate the time of the fix
-            TimeOfFix = parts[9].Length >= 6 ? ParseDateTime(parts[9] + parts[1]) : new DateTime();
+            Timestamp = parts[9].Length >= 6 ? ParseDateTime(parts[9] + parts[1]) : new DateTime();
 
             // Calculate the status
             Status = parts[2] == "A" ? StatusEnum.Ok : StatusEnum.Warning;
@@ -86,9 +86,9 @@ namespace agpsl.NET.NMEA
         public double Longitude { get; set; }
 
         /// <summary>
-        /// Date and Time of fix - GMT.
+        /// Date and Time of fix.
         /// </summary>
-        public DateTime TimeOfFix { get; }
+        public DateTime Timestamp { get; }
 
         /// <summary>
         /// Groundspeed in knots.
@@ -112,7 +112,7 @@ namespace agpsl.NET.NMEA
 
         public override string ToString()
         {
-            return $"$GPGGA Status: {Status} - TimeOfFix: {TimeOfFix} - Latitude: {Latitude} - Longitude: {Longitude} - Course: {Course} - Speed: {Speed} - MagneticVariation: {MagneticVariation}";
+            return $"$GPGGA Status: {Status} - Timestamp: {Timestamp} - Latitude: {Latitude} - Longitude: {Longitude} - Course: {Course} - Speed: {Speed} - MagneticVariation: {MagneticVariation}";
         }
 
     }

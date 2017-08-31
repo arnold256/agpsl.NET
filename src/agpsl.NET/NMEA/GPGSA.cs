@@ -27,7 +27,7 @@ namespace agpsl.NET.NMEA
     /// <summary>
     /// Recommended minimum specific GPS/Transit data
     /// </summary>
-    public class GPGSA : MNEAHelper
+    public class GPGSA : Message
     {
         /// <summary>
         /// GSA Fix mode

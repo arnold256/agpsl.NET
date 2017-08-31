@@ -22,21 +22,18 @@
 
 namespace agpsl.NET.PMTK
 {
-    public class PmtkSetDatum : PmtkHelper
-    {
+    /// <summary>
+    /// Test Packet
+    /// </summary>
+    public class Test : InputMessage
+    {      
+        public Test()
+        {}
 
-        /// <summary>
-        /// </summary>
-        /// <param name="DatumId"> 35 = Australian Geodetic 1984 </param>
-        public PmtkSetDatum(int datumId)
-        {
-            Payload = datumId.ToString();
-        }
+        public override int Command => 000;
 
-        public override string Command => "330";
+        public override string CommandName => "PMTK_TEST";
 
-        public override string CommandName => "PMTK_API_SET_DATUM";
-
-        public override string Payload { get;}
+        public override string Payload => "";
     }
 }

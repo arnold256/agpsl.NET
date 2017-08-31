@@ -25,24 +25,24 @@ using System.Globalization;
 
 namespace agpsl.NET.NMEA
 {    
-    public abstract class MNEAHelper
+    public abstract class Message
     {
         protected static readonly string[] DateTimeFormats = { "o", "ddMMyyHHmmss", "ddMMyy", "ddMMyyHHmmss.FFFFFF", "hhmmss.fff" };
         protected static readonly NumberFormatInfo NumberFormatEnUs = new CultureInfo("en-US", false).NumberFormat;
 
+        /// <summary>
+        /// Converts various GPS strings to a dateTime
+        /// </summary>
+        /// <param name="nmeaTime"></param>
+        /// <returns></returns>
         protected DateTime ParseDateTime(string nmeaTime)
         {
-            try
-            {
-                return DateTime.ParseExact(nmeaTime, DateTimeFormats, NumberFormatEnUs, DateTimeStyles.AssumeUniversal);
-            }
-            catch
-            {
-               return DateTime.MinValue;
-            }
-            
-        }
+            if (DateTime.TryParseExact(nmeaTime, DateTimeFormats, NumberFormatEnUs, DateTimeStyles.AssumeUniversal,
+                out DateTime timestamp))
+                return timestamp;
 
+            return DateTime.MinValue;                        
+        }
 
         /// <summary>
         /// Converts GPS position in d"dd.ddd' to decimal degrees ddd.ddddd
@@ -91,13 +91,14 @@ namespace agpsl.NET.NMEA
             return dbl;
         }
 
-        protected static int ParseInt(string str)
+        protected static int ParseInt(string str, int defaultInt = -1)
         {
-            int.TryParse(str, NumberStyles.Number, NumberFormatEnUs, out int numb);
-            return numb;
+            if(int.TryParse(str, NumberStyles.Number, NumberFormatEnUs, out int numb))
+                return numb;
+            return defaultInt;
         }
 
-        public static MNEAHelper ProcessMessage(string message)
+        public static Message ProcessMessage(string message, GPGSV lastGsvMessage = null)
         {
             var command = message.Substring(1, 5);
 
@@ -123,8 +124,11 @@ namespace agpsl.NET.NMEA
 
                 // Satellites in view
                 case "GPGSV":
-                    
-                    break;
+                    if(lastGsvMessage == null)
+                        lastGsvMessage = new GPGSV();
+
+                    lastGsvMessage.AddSentence(message);
+                    return lastGsvMessage;
 
                 // GPS DOP and active satellites
                 case "GPGSA":

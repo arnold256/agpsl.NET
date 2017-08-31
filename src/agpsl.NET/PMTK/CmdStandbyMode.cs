@@ -25,12 +25,12 @@ namespace agpsl.NET.PMTK
     /// <summary>
     /// Hot Restart: Use all available data in the NV Store. 
     /// </summary>
-    public class CmdHotStart : PmtkHelper
+    public class CmdHotStart : InputMessage
     {
-        public override string Command => "101";
+        public override int Command => 101;
 
         public override string CommandName => "PMTK_CMD_HOT_START";
 
-        public override string Payload => "";
+        public override string Payload => "";       
     }
 }

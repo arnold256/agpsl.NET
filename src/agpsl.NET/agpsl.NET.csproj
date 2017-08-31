@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>agpsl.NET</RootNamespace>
     <AssemblyName>agpsl.NET</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,42 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Win32.Registry, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\Microsoft.Win32.Registry.4.3.0\lib\net46\Microsoft.Win32.Registry.dll</HintPath>
-    </Reference>
-    <Reference Include="RJCP.SerialPortStream, Version=2.1.2.0, Culture=neutral, PublicKeyToken=5f5e7b70c6a74deb, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\SerialPortStream.2.1.2\lib\net45\RJCP.SerialPortStream.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Specialized, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Collections.Specialized.4.3.0\lib\net46\System.Collections.Specialized.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.FileVersionInfo, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Diagnostics.FileVersionInfo.4.3.0\lib\net46\System.Diagnostics.FileVersionInfo.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Diagnostics.TraceSource, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Diagnostics.TraceSource.4.3.0\lib\net46\System.Diagnostics.TraceSource.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.FileSystem, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Threading.Overlapped, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Threading.Overlapped.4.3.0\lib\net46\System.Threading.Overlapped.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Thread, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Threading.Thread.4.3.0\lib\net46\System.Threading.Thread.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.ThreadPool, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>c:\Users\ben.gpaeng\documents\visual studio 2017\Projects\GPS\packages\System.Threading.ThreadPool.4.3.0\lib\net46\System.Threading.ThreadPool.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GPS.cs" />
@@ -75,20 +42,26 @@
     <Compile Include="NMEA\GPGSA.cs" />
     <Compile Include="NMEA\GPGGA.cs" />
     <Compile Include="NMEA\GPRMC.cs" />
-    <Compile Include="NMEA\MNEAHelper.cs" />
+    <Compile Include="NMEA\Message.cs" />
+    <Compile Include="PMTK\Ack.cs" />
+    <Compile Include="PMTK\ApiQNemaOutput.cs" />
+    <Compile Include="PMTK\ApiQDatumAdvance.cs" />
+    <Compile Include="PMTK\ApiQDatum.cs" />
     <Compile Include="PMTK\CmdColdStart.cs" />
     <Compile Include="PMTK\CmdFullColdStart.cs" />
     <Compile Include="PMTK\CmdHotStart.cs" />
     <Compile Include="PMTK\CmdStandbyMode.cs" />
     <Compile Include="PMTK\ApiSetNmeaOutput.cs" />
     <Compile Include="PMTK\CmdWarmStart.cs" />
-    <Compile Include="PMTK\PMTKHelper.cs" />
-    <Compile Include="PMTK\PmtkSetDatum.cs" />
-    <Compile Include="PMTK\PmtkSetNemaBaudrate.cs" />
+    <Compile Include="PMTK\DtNemaOutput.cs" />
+    <Compile Include="PMTK\DtDatum.cs" />
+    <Compile Include="PMTK\InputMessage.cs" />
+    <Compile Include="PMTK\Message.cs" />
+    <Compile Include="PMTK\ResponseMessage.cs" />
+    <Compile Include="PMTK\SetDatum.cs" />
+    <Compile Include="PMTK\SetNemaBaudrate.cs" />
+    <Compile Include="PMTK\Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

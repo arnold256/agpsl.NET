@@ -22,25 +22,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using agpsl.NET.NMEA;
 using agpsl.NET.PMTK;
-using RJCP.IO.Ports;
+using System.IO.Ports;
 
 namespace agpsl.NET
 {
-    public class GPS
+    public class GPS : IDisposable
     {
-        private readonly SerialPortStream _sp;
+        private readonly SerialPort _sp;
         private string _messageBuffer;
 
-        public delegate void GPSEventEventHandler(GPS sender, MNEAHelper message);
+        public delegate void GPSEventEventHandler(GPS sender, NMEA.Message message);
 
         public event GPSEventEventHandler GPSEvent;
 
         public bool LogToConsole = false;
 
-        private HashSet<PmtkHelper> _commands = new HashSet<PmtkHelper>();
+        private HashSet<InputMessage> _commands = new HashSet<InputMessage>();
+
+        private GPGSV _gsvMessage;
+
+        private bool _disposed;
 
         /// <summary>
         /// Create and open serial port connection
@@ -49,24 +55,43 @@ namespace agpsl.NET
         /// <param name="baud"></param>
         public GPS(string port, int baud)
         {
-            _sp = new SerialPortStream(port, baud);
-            _sp.DataReceived += DataReceived;
-            _sp.ReceivedBytesThreshold = 1;
-            _sp.Handshake = Handshake.None;
-            _sp.Open();
 
+            _sp = new SerialPort(port, baud)
+            {
+                Handshake = Handshake.None
+            };
+            _sp.Open();
+            KickoffRead();
         }
-        
+
+        void KickoffRead()
+        {
+            byte[] buffer = new byte[1024];
+            _sp.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
+            {
+                try
+                {
+                    int actualLength = _sp.BaseStream.EndRead(ar);
+                    byte[] received = new byte[actualLength];
+                    Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
+                    DataReceived(Encoding.ASCII.GetString(received));
+                }
+                catch //(IOException exc)
+                {
+                    // Not sure what to do with this.
+                }
+                if(!_disposed)
+                    KickoffRead();
+            }, null);
+        }
+
         /// <summary>
         /// Data received on the commport event.  Extract NMEA messages and
         /// pass them on to be processed.
         /// </summary>
-        private void DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (e.EventType != SerialData.Chars)
-                return;
-
-            _messageBuffer += _sp.ReadExisting();
+        private void DataReceived(string receivedMessage)
+        {          
+            _messageBuffer += receivedMessage;
 
             // Allow multiple NMEA messages to be processed by a single event
             while(!string.IsNullOrEmpty(_messageBuffer))
@@ -108,12 +133,18 @@ namespace agpsl.NET
         /// <param name="message"></param>
         private void ProcessMessage(string message)
         {
-            var nmeaMessage = MNEAHelper.ProcessMessage(message);
+            var nmeaMessage = NMEA.Message.ProcessMessage(message, _gsvMessage);
+            if (LogToConsole) Console.Write($"{message}");
 
             if (nmeaMessage != null)
             {
-
-                if(LogToConsole) Console.Write($"Processed - {message}");
+                if (nmeaMessage is GPGSV gsv)
+                {
+                    _gsvMessage = gsv;
+                    if (!_gsvMessage.LastMsg)
+                        return;
+                }
+                
                 GPSEvent?.Invoke(this, nmeaMessage);
             }
             else
@@ -121,24 +152,39 @@ namespace agpsl.NET
                 if (message.StartsWith("$PMTK"))
                 {
                     // Remove the command when it is finished
-                    _commands.RemoveWhere(c => c.ResponseType != PmtkHelper.PmtkResponseType.WaitingResponse);
+                    _commands.RemoveWhere(c => c.ResponseType != InputMessage.PmtkResponseType.WaitingResponse);
 
                     // Add response to each of the waiting messages
                     foreach (var command in _commands)                    
                         command.AddResponse(message);                   
-                }
-                else if (LogToConsole)
-                    Console.Write($"Not Processed - {message}");                
+                }                    
             }
         }
 
         /// <summary>
         /// Send a command to the GPS module
         /// </summary>
-        public Task<PmtkHelper.PmtkResponseType> SendCommandAsync(PmtkHelper command)
+        public Task<PMTK.Message.PmtkResponseType> SendCommandAsync(InputMessage command)
         {
+            _commands.Add(command);
             _sp.Write(command.GetMessage());
+            //Console.Write(command.GetMessage());
             return command.WaitForResponse();
+        }
+
+        /// <summary>
+        /// Sends a test (ping) to the GPS module to ensure it is working correctly.
+        /// </summary>
+        /// <returns></returns>
+        public PMTK.Message.PmtkResponseType SendTestMessage()
+        {
+            return SendCommandAsync(new Test()).Result;
+        }
+
+        public void Dispose()
+        {
+            _sp?.Dispose();
+            _disposed = true;
         }
     }
 }

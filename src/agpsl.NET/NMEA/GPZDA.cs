@@ -27,7 +27,7 @@ namespace agpsl.NET.NMEA
     /// <summary>
     /// Date & Time
     /// </summary>
-    public class GPZDA : MNEAHelper
+    public class GPZDA : Message
     {
       public GPZDA(string message)
         {

@@ -25,9 +25,8 @@ namespace agpsl.NET.PMTK
     /// <summary>
     /// Enter standby mode for power saving. 
     /// </summary>
-    public class CmdStandbyMode : PmtkHelper
+    public class CmdStandbyMode : InputMessage
     {
-
         /// <summary>
         /// Standby type：
         /// false = Stop mode, stop NMEA output, the receiver stays at ultra low power state
@@ -39,10 +38,10 @@ namespace agpsl.NET.PMTK
             Payload = mode ? "1" : "0";
         }
 
-        public override string Command => "161";
+        public override int Command => 161;
 
         public override string CommandName => "PMTK_CMD_STANDBY_MODE";
 
-        public override string Payload { get; }
+        public override string Payload { get; }     
     }
 }

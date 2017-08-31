@@ -28,7 +28,7 @@ namespace agpsl.NET.NMEA
     /// <summary>
     /// Satellites in view
     /// </summary>
-    public class GPGSV : MNEAHelper
+    public class GPGSV : Message
     {
         private bool _firstMessageParsed = false;
 
@@ -60,10 +60,10 @@ namespace agpsl.NET.NMEA
             else if (!_firstMessageParsed) //If we haven't received the first GSV message, return
                 return false;
 
-            var lastMsg = (msgCount == msgNumber); //Is this the last GSV message in the GSV messages?
+            LastMsg = (msgCount == msgNumber); //Is this the last GSV message in the GSV messages?
             int satsInMsg;
 
-            if (!lastMsg)
+            if (!LastMsg)
                 satsInMsg = 4; //If this isn't the last message, the message will hold info for 4 satellites
             else
                 satsInMsg = SatellitesInView - 4 * (msgNumber - 1); //calculate number of satellites in last message
@@ -73,16 +73,18 @@ namespace agpsl.NET.NMEA
                 var sat = new Satellite
                 {
                     Prn = parts[i * 4 + 4],
-                    Elevation = Convert.ToByte(parts[i * 4 + 5]),
-                    Azimuth = Convert.ToInt16(parts[i * 4 + 6]),
-                    Snr = Convert.ToByte(parts[i * 4 + 7])
+                    Elevation = ParseInt(parts[i * 4 + 5]),
+                    Azimuth = ParseInt(parts[i * 4 + 6]),
+                    Snr = ParseInt(parts[i * 4 + 7])
                 };
                 Satellites.Add(sat);
             }
 
-            return lastMsg;
+            return LastMsg;
 
         }
+        internal bool LastMsg { get; private set; }
+
 
         /// <summary>
         /// Number of satellites visible
@@ -106,15 +108,15 @@ namespace agpsl.NET.NMEA
             /// <summary>
             /// Elevation above horizon in degrees (0-90)
             /// </summary>
-            public byte Elevation;
+            public int Elevation;
             /// <summary>
             /// Azimuth	in degrees (0-359)
             /// </summary>
-            public short Azimuth;
+            public int Azimuth;
             /// <summary>
             /// Signal-to-noise ratio in dBHZ (0-99)
             /// </summary>
-            public byte Snr;
+            public int Snr;
 
             public override string ToString()
             {
@@ -124,7 +126,7 @@ namespace agpsl.NET.NMEA
 
         public override string ToString()
         {
-            return $"$GPGSV  SatellitesInView: {SatellitesInView} - Satellites: {string.Join(",", Satellites)}";
+            return $"$GPGSV  SatellitesInView: {SatellitesInView} - Satellites: \n{string.Join(",\n", Satellites)}";
         }
 
     }

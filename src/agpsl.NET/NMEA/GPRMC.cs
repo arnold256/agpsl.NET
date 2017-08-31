@@ -27,7 +27,7 @@ namespace agpsl.NET.NMEA
     /// <summary>
     /// Global Positioning System Fix Data
     /// </summary>
-    public class GPGGA : MNEAHelper
+    public class GPGGA : Message
     {
         /// <summary>
         /// Fix Quality.
@@ -144,7 +144,7 @@ namespace agpsl.NET.NMEA
 
         public override string ToString()
         {
-            return $"$GPRMC FixQuality: {FixQuality} - TimeOfFix: {TimeOfFix} - Latitude: {Latitude} - Longitude: {Longitude} - NumberOfSatellites: {NumberOfSatellites} - Altitude: {Altitude} - AltitudeUnits: {AltitudeUnits} - Dilution: {Dilution} - HeightOfGeoid: {HeightOfGeoid} - DGPSUpdate: {DGPSUpdate} - DGPSStationID: {DGPSStationID}";
+            return $"$GPRMC FixQuality: {FixQuality} - Timestamp: {TimeOfFix} - Latitude: {Latitude} - Longitude: {Longitude} - NumberOfSatellites: {NumberOfSatellites} - Altitude: {Altitude} - AltitudeUnits: {AltitudeUnits} - Dilution: {Dilution} - HeightOfGeoid: {HeightOfGeoid} - DGPSUpdate: {DGPSUpdate} - DGPSStationID: {DGPSStationID}";
         }
 
     }
