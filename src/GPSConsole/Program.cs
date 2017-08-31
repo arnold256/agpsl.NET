@@ -44,14 +44,25 @@ namespace GPSConsole
             if (string.IsNullOrWhiteSpace(baud))
                 baud = defaultstr;
 
-            var gps = new agpsl.NET.GPS(commport, int.Parse(baud)) {LogToConsole = false};
+            defaultstr = "1";
+            Console.WriteLine($"Use Serial DataReceived event ({defaultstr}):");
+            var strSerialEvent =  Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(strSerialEvent))
+                strSerialEvent = defaultstr;
+
+            var serialEvent = strSerialEvent == "1";
+
+           
+
+            var gps = new agpsl.NET.GPS(commport, int.Parse(baud), serialEvent) {LogToConsole = false};
             
             var response = gps.SendTestMessage();
             Console.WriteLine($"Response to test message was {response}");
 
 
             // Set the type of output you are interested in.
-            response = gps.SendCommandAsync(new ApiSetNmeaOutput(5, 0, 0, 0, 0, 5, 0, 0, 1, 0, 0)).Result;
+            response = gps.SendCommandAsync(new ApiSetNmeaOutput(10, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0)).Result;
             Console.WriteLine($"Response to ApiSetNmeaOutput was {response}");
 
             InputMessage request = new ApiQDatum();

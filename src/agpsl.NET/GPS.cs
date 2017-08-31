@@ -28,7 +28,6 @@ using System.Threading.Tasks;
 using agpsl.NET.NMEA;
 using agpsl.NET.PMTK;
 using System.IO.Ports;
-using Message = agpsl.NET.PMTK.Message;
 
 namespace agpsl.NET
 {
@@ -48,23 +47,56 @@ namespace agpsl.NET
         private GPGSV _gsvMessage;
 
         private bool _disposed;
+        public bool UseDataReceivedEvent { get; }
+
+        private static bool IsWindows
+        {
+            get
+            {
+                PlatformID id = Environment.OSVersion.Platform;
+                return id == PlatformID.Win32Windows || id == PlatformID.Win32NT; // WinCE not supported
+            }
+        }
 
         /// <summary>
         /// Create and open serial port connection
         /// </summary>
-        /// <param name="port"></param>
-        /// <param name="baud"></param>
-        public GPS(string port, int baud)
+        /// <param name="port">comm port to open</param>
+        /// <param name="baud">baud rate to open the port at</param>
+        /// <param name="useDataReceivedEvent">When true the data received event is used rather than the BaseSerialStream</param>
+        public GPS(string port, int baud, bool useDataReceivedEvent = true)
         {
+            UseDataReceivedEvent = useDataReceivedEvent;
 
-            _sp = new SerialPort(port, baud)
+            if (!IsWindows && UseDataReceivedEvent)
             {
-                Handshake = Handshake.None
-            };
-            _sp.Open();
-            KickoffRead();
+                //Console.WriteLine("Creating EnhancedSerialPort");
+                _sp = new EnhancedSerialPort(port, baud);
+                ((EnhancedSerialPort) _sp).Open();
+            }
+            else
+            {
+                //Console.WriteLine("Standard SerialPort");
+                _sp = new SerialPort(port, baud);
+                _sp.Open();
+            }
+
+            if (UseDataReceivedEvent)
+            {
+                //Console.WriteLine("Adding DataReceived Event");
+                _sp.DataReceived += (sender, args) => { ProcessData(_sp.ReadExisting()); };
+            }
+            else
+            {
+                //Console.WriteLine("Using BaseDataStream");
+                KickoffRead();
+            }
+            
         }
 
+        /// <summary>
+        /// Call Process Data when new data is avaliable.
+        /// </summary>
         void KickoffRead()
         {
             byte[] buffer = new byte[1024];
@@ -75,7 +107,7 @@ namespace agpsl.NET
                     int actualLength = _sp.BaseStream.EndRead(ar);
                     byte[] received = new byte[actualLength];
                     Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
-                    DataReceived(Encoding.ASCII.GetString(received));
+                    ProcessData(Encoding.ASCII.GetString(received));
                 }
                 catch (IOException)
                 {
@@ -94,8 +126,8 @@ namespace agpsl.NET
         /// Data received on the commport event.  Extract NMEA messages and
         /// pass them on to be processed.
         /// </summary>
-        private void DataReceived(string receivedMessage)
-        {          
+        private void ProcessData(string receivedMessage)
+        {        
             _messageBuffer += receivedMessage;
 
             // Allow multiple NMEA messages to be processed by a single event
@@ -159,7 +191,7 @@ namespace agpsl.NET
                     if (message.StartsWith("$PMTK"))
                     {
                         // Remove the command when it is finished
-                        _commands.RemoveWhere(c => c.ResponseType != Message.PmtkResponseType.WaitingResponse);
+                        _commands.RemoveWhere(c => c.ResponseType != PMTK.Message.PmtkResponseType.WaitingResponse);
 
                         // Add response to each of the waiting messages
                         foreach (var command in _commands)                    
