@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using agpsl.NET.NMEA;
 using agpsl.NET.PMTK;
 using System.IO.Ports;
+using Message = agpsl.NET.PMTK.Message;
 
 namespace agpsl.NET
 {
@@ -76,11 +77,15 @@ namespace agpsl.NET
                     Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
                     DataReceived(Encoding.ASCII.GetString(received));
                 }
-                catch //(IOException exc)
+                catch (IOException)
                 {
                     // Not sure what to do with this.
+                    // TODO do something with this error
+
+                    // Added a delay to prevent this using all CPU
+                    Task.Delay(1000);
                 }
-                if(!_disposed)
+                if (!_disposed)
                     KickoffRead();
             }, null);
         }
@@ -133,31 +138,39 @@ namespace agpsl.NET
         /// <param name="message"></param>
         private void ProcessMessage(string message)
         {
-            var nmeaMessage = NMEA.Message.ProcessMessage(message, _gsvMessage);
-            if (LogToConsole) Console.Write($"{message}");
+            try
+            {           
+                var nmeaMessage = NMEA.Message.ProcessMessage(message, _gsvMessage);
+                if (LogToConsole) Console.Write($"{message}");
 
-            if (nmeaMessage != null)
-            {
-                if (nmeaMessage is GPGSV gsv)
+                if (nmeaMessage != null)
                 {
-                    _gsvMessage = gsv;
-                    if (!_gsvMessage.LastMsg)
-                        return;
-                }
+                    if (nmeaMessage is GPGSV gsv)
+                    {
+                        _gsvMessage = gsv;
+                        if (!_gsvMessage.LastMsg)
+                            return;
+                    }
                 
-                GPSEvent?.Invoke(this, nmeaMessage);
-            }
-            else
-            {
-                if (message.StartsWith("$PMTK"))
+                    GPSEvent?.Invoke(this, nmeaMessage);
+                }
+                else
                 {
-                    // Remove the command when it is finished
-                    _commands.RemoveWhere(c => c.ResponseType != InputMessage.PmtkResponseType.WaitingResponse);
+                    if (message.StartsWith("$PMTK"))
+                    {
+                        // Remove the command when it is finished
+                        _commands.RemoveWhere(c => c.ResponseType != Message.PmtkResponseType.WaitingResponse);
 
-                    // Add response to each of the waiting messages
-                    foreach (var command in _commands)                    
-                        command.AddResponse(message);                   
-                }                    
+                        // Add response to each of the waiting messages
+                        foreach (var command in _commands)                    
+                            command.AddResponse(message);                   
+                    }                    
+                }
+            }
+            catch
+            {
+               // Throw the error away.  Probably an error trying to parse a corrupt packet.
+               // TODO fix the catch all error handler
             }
         }
 
